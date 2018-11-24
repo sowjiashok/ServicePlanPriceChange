@@ -1,34 +1,51 @@
 package controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.constants.UpdateServicePriceConstants;
 import com.model.PriceUpdateBasedOnCountryReportAsResponse;
 import com.model.UpdatePriceBasedOnCountryRequest;
 import com.service.UpdatePricingBasedOnCountryService;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//@Validated
+@Validated
 @RestController
+@RequestMapping(value = UpdateServicePriceConstants.BASE_URI)
 public class UpdatePricingBasedOnCountryController {
 	
 	private static Logger logger = LoggerFactory.getLogger(UpdatePricingBasedOnCountryController.class);
 	
 	
 	@Autowired
-	UpdatePricingBasedOnCountryService updatePricingBasedOnCountryService;
+	private UpdatePricingBasedOnCountryService updatePricingBasedOnCountryService;
 	
+	@Autowired
+	@Qualifier("updatePriceBasedOnCountryRequestValidator")
+	private Validator updatePriceBasedOnCountryRequestValidator;
 	
+	/* Wire the custom validator for the Request body */
+	@InitBinder()
+	public void initBinder(WebDataBinder binder) {
+		binder.setValidator(updatePriceBasedOnCountryRequestValidator);
+	}
 	
-	
+
 	/**
 	 * Service to create a Message
 	 * @param message
@@ -36,7 +53,7 @@ public class UpdatePricingBasedOnCountryController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/subscription-pricing", method = RequestMethod.POST, consumes="application/json")
-	public ResponseEntity<PriceUpdateBasedOnCountryReportAsResponse> updatePricingBasedOnCountry(@RequestBody UpdatePriceBasedOnCountryRequest updatePriceRequest) throws Exception{
+	public ResponseEntity<PriceUpdateBasedOnCountryReportAsResponse> updatePricingBasedOnCountry(@Valid @RequestBody UpdatePriceBasedOnCountryRequest updatePriceRequest, BindingResult binding) throws Exception{
 		logger.debug("Entering UpdatePricingBasedOnCountryController - updatePricingBasedOnCountry().." );
 
 		/* Add message to the in-memory store */

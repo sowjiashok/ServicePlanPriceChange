@@ -2,10 +2,7 @@ package com.errorcodes;
 
 public enum ServiceErrorCodes {
 	
-	INVALID_MESSAGE("9001", "Invalid Message"),
-	EMPTY_DATASET("9002", "No Message data found"),
-	EMPTY_USERSET("9003", "No user data found"),
-	INVALID_USERNAME("9004", "Invalid user name");
+	INVALID_SERVICE_DESCRIPTION("9001", "Invalid Service Description");
 	
 	private final String value;
 	
