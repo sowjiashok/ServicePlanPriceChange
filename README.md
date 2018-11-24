@@ -1,1 +1,27 @@
 # ServicePlanPriceChange
+
+RUNNING APPLICATION: The API's can be run by running this command: mvn spring-boot:run.
+LOGGING: Logging can be viewed on the terminal, by running http://localhost:8080/ on the browser.
+
+The Netflix Pricing Subscription allows to update the price as per given Country, Service Plan and New Price using the following API:
+
+1. POST http://localhost:8080/subscription-pricing
+
+Example:
+
+JSON Request:
+	{
+            "serviceDescription": "1S",
+            "priceChangeAmt": "12.00",
+            "customerCountry": "India"
+	}
+
+JSON Response:
+	{
+    "countryServiceId": 8,
+    "countryCode": "IN",
+    "serviceId": 1,
+    "updatedPrice": 840
+	}	
+
+	
