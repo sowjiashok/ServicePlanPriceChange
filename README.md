@@ -1,6 +1,8 @@
 # ServicePlanPriceChange
 
-RUNNING APPLICATION: The API's can be run by running this command: mvn spring-boot:run.
+Open as Maven project or go to the following folder on terminal: ServicePlanPriceChange/gs-rest-service/complete
+
+RUNNING APPLICATION: Now, the API's can be run by running this command: mvn spring-boot:run.
 LOGGING: Logging can be viewed on the terminal, by running http://localhost:8080/ on the browser.
 
 The Netflix Pricing Subscription allows to update the price as per given Country, Service Plan and New Price using the following API:
