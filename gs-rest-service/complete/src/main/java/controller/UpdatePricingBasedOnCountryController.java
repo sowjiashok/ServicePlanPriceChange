@@ -47,7 +47,7 @@ public class UpdatePricingBasedOnCountryController {
 	
 
 	/**
-	 * Service to create a Message
+	 * Service to insert new pricing, based on given Country Code, New Pricing and Service Plan.
 	 * @param message
 	 * @return
 	 * @throws Exception
@@ -56,7 +56,7 @@ public class UpdatePricingBasedOnCountryController {
 	public ResponseEntity<PriceUpdateBasedOnCountryReportAsResponse> updatePricingBasedOnCountry(@Valid @RequestBody UpdatePriceBasedOnCountryRequest updatePriceRequest, BindingResult binding) throws Exception{
 		logger.debug("Entering UpdatePricingBasedOnCountryController - updatePricingBasedOnCountry().." );
 
-		/* Add message to the in-memory store */
+		/* Add new pricing based on Country and Service */
 		PriceUpdateBasedOnCountryReportAsResponse updatedPriceReport = updatePricingBasedOnCountryService.updateServicePricing(updatePriceRequest);
 		
 		logger.debug("Exiting UpdatePricingBasedOnCountryController - updatePricingBasedOnCountry()" );
