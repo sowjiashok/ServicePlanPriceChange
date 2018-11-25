@@ -3,7 +3,7 @@ LOGGING: Logging can be viewed on the terminal, by running http://localhost:8080
 
 The Netflix Pricing Subscription allows to update the price as per given Country, Service Plan and New Price using the following API:
 
-1. POST http://localhost:8080/subscription-pricing
+1. POST http://localhost:8080/v1/subscription-pricing
 
 Example:
 
