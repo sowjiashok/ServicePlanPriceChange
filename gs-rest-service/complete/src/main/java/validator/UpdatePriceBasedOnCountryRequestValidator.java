@@ -11,7 +11,9 @@ import org.springframework.validation.Validator;
 import com.constants.UpdateServicePriceConstants;
 import com.errorcodes.ServiceErrorCodes;
 import com.model.UpdatePriceBasedOnCountryRequest;
-
+/*
+ * Custom Validator for validating input fields from UpdatePriceBasedOnCountryRequest. 
+ */
 @Component(value = "updatePriceBasedOnCountryRequestValidator")
 public class UpdatePriceBasedOnCountryRequestValidator implements Validator{
 	
@@ -35,6 +37,7 @@ public class UpdatePriceBasedOnCountryRequestValidator implements Validator{
 	
 	public void validateUpdatePriceBasedOnCountryRequest(Errors errors, UpdatePriceBasedOnCountryRequest updatePriceBasedOnCountryRequest) {
 		String serviceDescription = updatePriceBasedOnCountryRequest.getServiceDescription();
+		BigDecimal price = updatePriceBasedOnCountryRequest.getPriceChangeAmt();
 		
 		/* Validation against the input serviceDescription field
 		 * 1. The service decription is allowed to be only either of the following; 1S, 2S, 4S
@@ -42,7 +45,11 @@ public class UpdatePriceBasedOnCountryRequestValidator implements Validator{
 		 * 3. Uppercase/ lowercase enhancements can be supported in future */
 		if(serviceDescription.equals(null) || serviceDescription.length() < UpdateServicePriceConstants.SERVICE_DESC_MIN_LEN || 
 				serviceDescription.length() > UpdateServicePriceConstants.SERVICE_DESC_MIN_LEN  || !UpdateServicePriceConstants.serviceSet.contains(serviceDescription)) {
-			errors.rejectValue(UpdateServicePriceConstants.SERVICE_DESC_JSON_INPUT, ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getValue());
+			errors.rejectValue(UpdateServicePriceConstants.SERVICE_DESC_JSON_INPUT, ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getReasonPhrase(), ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getValue());
+		}
+		if(price == null) {
+			errors.rejectValue(UpdateServicePriceConstants.PRICE_CHANGE_VALUE_NULL, ServiceErrorCodes.PRICE_CHANGE_VALUE_NULL.getReasonPhrase(), ServiceErrorCodes.PRICE_CHANGE_VALUE_NULL.getValue());
+
 		}
 	}
 

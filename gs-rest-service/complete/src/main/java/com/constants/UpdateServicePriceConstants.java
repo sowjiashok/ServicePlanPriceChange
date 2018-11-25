@@ -10,6 +10,7 @@ public class UpdateServicePriceConstants {
 	public static final String BASE_URI =  "/v1";
 	public static final int SERVICE_DESC_MIN_LEN = 2;
 	public static final String SERVICE_DESC_JSON_INPUT = "serviceDescription";
+	public static final String PRICE_CHANGE_VALUE_NULL = "priceChangeAmt";
 	
 	static {
 		serviceSet.add("1S");

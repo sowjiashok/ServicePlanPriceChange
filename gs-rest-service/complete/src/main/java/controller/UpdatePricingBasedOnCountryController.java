@@ -58,14 +58,6 @@ public class UpdatePricingBasedOnCountryController {
 	@RequestMapping(value = "/subscription-pricing", method = RequestMethod.POST, consumes="application/json")
 	public ResponseEntity<PriceUpdateBasedOnCountryReportAsResponse> updatePricingBasedOnCountry(@Valid @RequestBody UpdatePriceBasedOnCountryRequest updatePriceBasedOnCountryRequest) throws Exception{
 		logger.debug("Entering UpdatePricingBasedOnCountryController - updatePricingBasedOnCountry().." );
-		
-//		if(binding.hasErrors()) {
-////			for(ObjectError e: binding.getAllErrors()) {
-////				throw new ApplicationException(e.getCode(), ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getReasonPhrase());
-////			}
-//			
-//			throw new ApplicationException(ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getValue(), ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getReasonPhrase());
-//		}
 
 		/* Add new pricing based on Country and Service */
 		PriceUpdateBasedOnCountryReportAsResponse updatedPriceReport = updatePricingBasedOnCountryService.updateServicePricing(updatePriceBasedOnCountryRequest);

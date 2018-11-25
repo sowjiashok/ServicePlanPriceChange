@@ -2,7 +2,8 @@ package com.errorcodes;
 
 public enum ServiceErrorCodes {
 	
-	INVALID_SERVICE_DESCRIPTION("9001", "Invalid Service Description");
+	INVALID_SERVICE_DESCRIPTION("9001", "Invalid Service Description"),
+	PRICE_CHANGE_VALUE_NULL("9002", "Invalid Price Change");
 	
 	private final String value;
 	
