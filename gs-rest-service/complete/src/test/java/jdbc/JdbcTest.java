@@ -34,13 +34,6 @@ public class JdbcTest {
     @After
     public void closeConnection() throws SQLException {
 
-//        Statement updatableStmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-//        ResultSet updatableResultSet = updatableStmt.executeQuery("SELECT * FROM employees");
-//
-//        while (updatableResultSet.next()) {
-//            updatableResultSet.deleteRow();
-//        }
-
         con.close();
     }
 

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.constants.UpdateServicePriceConstants;
+import com.errorcodes.ServiceErrorCodes;
+import com.exception.ApplicationException;
 import com.model.PriceUpdateBasedOnCountryReportAsResponse;
 import com.model.UpdatePriceBasedOnCountryRequest;
 import com.service.UpdatePricingBasedOnCountryService;
@@ -24,8 +27,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Validated
 @RestController
+@Validated
 @RequestMapping(value = UpdateServicePriceConstants.BASE_URI)
 public class UpdatePricingBasedOnCountryController {
 	
@@ -40,7 +43,7 @@ public class UpdatePricingBasedOnCountryController {
 	private Validator updatePriceBasedOnCountryRequestValidator;
 	
 	/* Wire the custom validator for the Request body */
-	@InitBinder()
+	@InitBinder("updatePriceBasedOnCountryRequest")
 	public void initBinder(WebDataBinder binder) {
 		binder.setValidator(updatePriceBasedOnCountryRequestValidator);
 	}
@@ -53,11 +56,19 @@ public class UpdatePricingBasedOnCountryController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/subscription-pricing", method = RequestMethod.POST, consumes="application/json")
-	public ResponseEntity<PriceUpdateBasedOnCountryReportAsResponse> updatePricingBasedOnCountry(@Valid @RequestBody UpdatePriceBasedOnCountryRequest updatePriceRequest, BindingResult binding) throws Exception{
+	public ResponseEntity<PriceUpdateBasedOnCountryReportAsResponse> updatePricingBasedOnCountry(@Valid @RequestBody UpdatePriceBasedOnCountryRequest updatePriceBasedOnCountryRequest) throws Exception{
 		logger.debug("Entering UpdatePricingBasedOnCountryController - updatePricingBasedOnCountry().." );
+		
+//		if(binding.hasErrors()) {
+////			for(ObjectError e: binding.getAllErrors()) {
+////				throw new ApplicationException(e.getCode(), ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getReasonPhrase());
+////			}
+//			
+//			throw new ApplicationException(ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getValue(), ServiceErrorCodes.INVALID_SERVICE_DESCRIPTION.getReasonPhrase());
+//		}
 
 		/* Add new pricing based on Country and Service */
-		PriceUpdateBasedOnCountryReportAsResponse updatedPriceReport = updatePricingBasedOnCountryService.updateServicePricing(updatePriceRequest);
+		PriceUpdateBasedOnCountryReportAsResponse updatedPriceReport = updatePricingBasedOnCountryService.updateServicePricing(updatePriceBasedOnCountryRequest);
 		
 		logger.debug("Exiting UpdatePricingBasedOnCountryController - updatePricingBasedOnCountry()" );
 

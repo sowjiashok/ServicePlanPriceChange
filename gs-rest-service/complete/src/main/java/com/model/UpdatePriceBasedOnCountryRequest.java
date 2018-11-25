@@ -2,16 +2,24 @@ package com.model;
 
 import java.math.BigDecimal;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UpdatePriceBasedOnCountryRequest {
 	
+	@Size(min=2, max=2)
+	@Pattern(regexp = "^[a-zA-Z0-9]*$")
 	@JsonProperty("serviceDescription")
 	private String serviceDescription;
-
+	
+    @Digits(integer=5, fraction=2)
 	@JsonProperty("priceChangeAmt")
 	private BigDecimal priceChangeAmt;
-	
+    
+	@Pattern(regexp = "^[a-zA-Z]*$")
 	@JsonProperty("customerCountry")
 	private String customerCountry;
 
