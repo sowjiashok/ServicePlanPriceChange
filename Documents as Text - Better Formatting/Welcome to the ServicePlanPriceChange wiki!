@@ -32,6 +32,12 @@ Assumptions:
 2. Each Country has a Currency Code and Country Code (ISO) where both the Country code and Currency Code are the same, this is represented as Keys between the Currency and Country tables.
 3. Each Country can have a max of the all following services: 1S, 2S, 4S. Hence, a new price change is applied based on the given Service plan and new Price.
 
+Reasoning behind this approach:
+
+1. Based on the inputs, we have 3 kinds of services.
+2. Based on the number of countries in this globe, rounding it to 200 countries, we can have a total of 600 combinations on pricing.
+3. Having this data, in a separate table - Country Service Pricing, allows us to limit the number of records. As a Customer table can contain more than 100M records. 
+4. In order to get the Customer pricing based on Service Plan and Country, one would need to make a call to Customer Service Pricing table.
 Data Model:
 
 1. Currency Code
