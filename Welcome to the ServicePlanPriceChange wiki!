@@ -1,0 +1,419 @@
+Welcome to the ServicePlanPriceChange wiki!
+
+Background Information: 	
+
+Netflix offers customers 3 service plans (1S, 2S, & 4S) based on the number of concurrent streams and priced accordingly.  As we are a global service, we have defined prices for each service plan for country we support.  For each customer we know the service plan (1S, 2S, or 4S), the price for the chosen plan and the country of the customer.
+
+
+Problem Statement:
+
+Netflix rolls out price changes for our service periodically.  In order to accurately and effective change the prices of 100M+ customers, we need to have a systematic solution for changing prices.  
+
+
+Objective:
+
+Design and implement a system that hosts Netflix pricing which will enable us to systematically change prices across all our global customers.  We want to see how your system supports price changes pushed by country.
+
+Functional Requirements:
+
+1. These are the following given inputs: a. Service Plan, b. Country c. New Price for Chosen Plan
+2. The service plan can belong to any of the following types: 1S, 2S, 4S.
+3. The Country can belong to any of the ISO list of countries, except Crimea, North Korea, Syria and China. (The below mentioned data on data objects and data examples illustrate more on the same).
+4. The new price, is calculated based on the current currency rate (from Currency Code table).
+
+
+Non-Functional Requirements:
+
+1. Cache the list of allowed Country codes from the database.(Can be implemented as a part of future scope of work).
+
+Assumptions:
+
+1. Each Customer has a service membership, that can belong to either of the following: 1S or 2S or 4S. Hence, each Customer has one Service Plan.
+2. Each Country has a Currency Code and Country Code (ISO) where both the Country code and Currency Code are the same, this is represented as Keys between the Currency and Country tables.
+3. Each Country can have a max of the all following services: 1S, 2S, 4S. Hence, a new price change is applied based on the given Service plan and new Price.
+
+Data Model:
+
+1. Currency Code
+
+mysql> describe currency_code;
++------------------+--------------+------+-----+---------+-------+
+| Field            | Type         | Null | Key | Default | Extra |
++------------------+--------------+------+-----+---------+-------+
+| currency_code    | char(3)      | NO   | PRI | NULL    |       |
+| conversion_value | decimal(7,2) | YES  |     | NULL    |       |
++------------------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+Example of how a conversion value is represented: For example, the conversion value below represents US -> CA.
+
+mysql> select * from currency_code;
++---------------+------------------+
+| currency_code | conversion_value |
++---------------+------------------+
+| CA            |             1.32 |
+| IN            |            70.00 |
+| US            |             1.00 |
++---------------+------------------+
+3 rows in set (0.00 sec)
+
+2. Country - Below has the Primary Key relations.
+
+mysql> describe country;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| country_code | char(3)      | NO   | PRI | NULL    |       |
+| country_name | varchar(255) | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+Country is the source of truth. Hence, the given country name, should exist in this table for valid Price increase onto the requested country.
+
+Country table data:
+
+mysql> select * from country;
++--------------+----------------------------------------------+
+| country_code | country_name                                 |
++--------------+----------------------------------------------+
+| AD           | Andorra                                      |
+| AE           | United Arab Emirates                         |
+| AF           | Afghanistan                                  |
+| AG           | Antigua and Barbuda                          |
+| AI           | Anguilla                                     |
+| AL           | Albania                                      |
+| AM           | Armenia                                      |
+| AN           | Netherlands Antilles                         |
+| AO           | Angola                                       |
+| AQ           | Antarctica                                   |
+| AR           | Argentina                                    |
+| AS           | American Samoa                               |
+| AT           | Austria                                      |
+| AU           | Australia                                    |
+| AW           | Aruba                                        |
+| AX           | Åland Islands                                |
+| AZ           | Azerbaijan                                   |
+| BA           | Bosnia and Herzegovina                       |
+| BB           | Barbados                                     |
+| BD           | Bangladesh                                   |
+| BE           | Belgium                                      |
+| BF           | Burkina Faso                                 |
+| BG           | Bulgaria                                     |
+| BH           | Bahrain                                      |
+| BI           | Burundi                                      |
+| BJ           | Benin                                        |
+| BL           | Saint Barthélemy                             |
+| BM           | Bermuda                                      |
+| BN           | Brunei                                       |
+| BO           | Bolivia                                      |
+| BQ           | Bonaire, Sint Eustatius and Saba             |
+| BR           | Brazil                                       |
+| BS           | Bahamas                                      |
+| BT           | Bhutan                                       |
+| BV           | Bouvet Island                                |
+| BW           | Botswana                                     |
+| BY           | Belarus                                      |
+| BZ           | Belize                                       |
+| CA           | Canada                                       |
+| CC           | Cocos Islands                                |
+| CD           | The Democratic Republic Of Congo             |
+| CF           | Central African Republic                     |
+| CG           | Congo                                        |
+| CH           | Switzerland                                  |
+| CI           | Cote dIvoire                                 |
+| CK           | Cook Islands                                 |
+| CL           | Chile                                        |
+| CM           | Cameroon                                     |
+| CO           | Colombia                                     |
+| CR           | Costa Rica                                   |
+| CU           | Cuba                                         |
+| CV           | Cape Verde                                   |
+| CW           | Curaçao                                      |
+| CX           | Christmas Island                             |
+| CY           | Cyprus                                       |
+| CZ           | Czech Republic                               |
+| DE           | Germany                                      |
+| DJ           | Djibouti                                     |
+| DK           | Denmark                                      |
+| DM           | Dominica                                     |
+| DO           | Dominican Republic                           |
+| DZ           | Algeria                                      |
+| EC           | Ecuador                                      |
+| EE           | Estonia                                      |
+| EG           | Egypt                                        |
+| EH           | Western Sahara                               |
+| ER           | Eritrea                                      |
+| ES           | Spain                                        |
+| ET           | Ethiopia                                     |
+| FI           | Finland                                      |
+| FJ           | Fiji                                         |
+| FK           | Falkland Islands                             |
+| FM           | Micronesia                                   |
+| FO           | Faroe Islands                                |
+| FR           | France                                       |
+| GA           | Gabon                                        |
+| GB           | United Kingdom                               |
+| GD           | Grenada                                      |
+| GE           | Georgia                                      |
+| GF           | French Guiana                                |
+| GG           | Guernsey                                     |
+| GH           | Ghana                                        |
+| GI           | Gibraltar                                    |
+| GL           | Greenland                                    |
+| GM           | Gambia                                       |
+| GN           | Guinea                                       |
+| GP           | Guadeloupe                                   |
+| GQ           | Equatorial Guinea                            |
+| GR           | Greece                                       |
+| GS           | South Georgia And The South Sandwich Islands |
+| GT           | Guatemala                                    |
+| GU           | Guam                                         |
+| GW           | Guinea-Bissau                                |
+| GY           | Guyana                                       |
+| HK           | Hong Kong                                    |
+| HM           | Heard Island And McDonald Islands            |
+| HN           | Honduras                                     |
+| HR           | Croatia                                      |
+| HT           | Haiti                                        |
+| HU           | Hungary                                      |
+| ID           | Indonesia                                    |
+| IE           | Ireland                                      |
+| IL           | Israel                                       |
+| IM           | Isle Of Man                                  |
+| IN           | India                                        |
+| IO           | British Indian Ocean Territory               |
+| IQ           | Iraq                                         |
+| IR           | Iran                                         |
+| IS           | Iceland                                      |
+| IT           | Italy                                        |
+| JE           | Jersey                                       |
+| JM           | Jamaica                                      |
+| JO           | Jordan                                       |
+| JP           | Japan                                        |
+| KE           | Kenya                                        |
+| KG           | Kyrgyzstan                                   |
+| KH           | Cambodia                                     |
+| KI           | Kiribati                                     |
+| KM           | Comoros                                      |
+| KN           | Saint Kitts And Nevis                        |
+| KR           | South Korea                                  |
+| KW           | Kuwait                                       |
+| KY           | Cayman Islands                               |
+| KZ           | Kazakhstan                                   |
+| LA           | Laos                                         |
+| LB           | Lebanon                                      |
+| LC           | Saint Lucia                                  |
+| LI           | Liechtenstein                                |
+| LK           | Sri Lanka                                    |
+| LR           | Liberia                                      |
+| LS           | Lesotho                                      |
+| LT           | Lithuania                                    |
+| LU           | Luxembourg                                   |
+| LV           | Latvia                                       |
+| LY           | Libya                                        |
+| MA           | Morocco                                      |
+| MC           | Monaco                                       |
+| MD           | Moldova                                      |
+| ME           | Montenegro                                   |
+| MF           | Saint Martin                                 |
+| MG           | Madagascar                                   |
+| MH           | Marshall Islands                             |
+| MK           | Macedonia                                    |
+| ML           | Mali                                         |
+| MM           | Myanmar                                      |
+| MN           | Mongolia                                     |
+| MO           | Macao                                        |
+| MP           | Northern Mariana Islands                     |
+| MQ           | Martinique                                   |
+| MR           | Mauritania                                   |
+| MS           | Montserrat                                   |
+| MT           | Malta                                        |
+| MU           | Mauritius                                    |
+| MV           | Maldives                                     |
+| MW           | Malawi                                       |
+| MX           | Mexico                                       |
+| MY           | Malaysia                                     |
+| MZ           | Mozambique                                   |
+| NA           | Namibia                                      |
+| NC           | New Caledonia                                |
+| NE           | Niger                                        |
+| NF           | Norfolk Island                               |
+| NG           | Nigeria                                      |
+| NI           | Nicaragua                                    |
+| NL           | Netherlands                                  |
+| NO           | Norway                                       |
+| NP           | Nepal                                        |
+| NR           | Nauru                                        |
+| NU           | Niue                                         |
+| NZ           | New Zealand                                  |
+| OM           | Oman                                         |
+| PA           | Panama                                       |
+| PE           | Peru                                         |
+| PF           | French Polynesia                             |
+| PG           | Papua New Guinea                             |
+| PH           | Philippines                                  |
+| PK           | Pakistan                                     |
+| PL           | Poland                                       |
+| PM           | Saint Pierre And Miquelon                    |
+| PN           | Pitcairn                                     |
+| PR           | Puerto Rico                                  |
+| PS           | Palestine                                    |
+| PT           | Portugal                                     |
+| PW           | Palau                                        |
+| PY           | Paraguay                                     |
+| QA           | Qatar                                        |
+| RE           | Reunion                                      |
+| RO           | Romania                                      |
+| RS           | Serbia                                       |
+| RU           | Russia                                       |
+| RW           | Rwanda                                       |
+| SA           | Saudi Arabia                                 |
+| SB           | Solomon Islands                              |
+| SC           | Seychelles                                   |
+| SD           | Sudan                                        |
+| SE           | Sweden                                       |
+| SG           | Singapore                                    |
+| SH           | Saint Helena                                 |
+| SI           | Slovenia                                     |
+| SJ           | Svalbard And Jan Mayen                       |
+| SK           | Slovakia                                     |
+| SL           | Sierra Leone                                 |
+| SM           | San Marino                                   |
+| SN           | Senegal                                      |
+| SO           | Somalia                                      |
+| SR           | Suriname                                     |
+| SS           | South Sudan                                  |
+| ST           | Sao Tome And Principe                        |
+| SV           | El Salvador                                  |
+| SX           | Sint Maarten                                 |
+| SZ           | Swaziland                                    |
+| TC           | Turks And Caicos Islands                     |
+| TD           | Chad                                         |
+| TF           | French Southern Territories                  |
+| TG           | Togo                                         |
+| TH           | Thailand                                     |
+| TJ           | Tajikistan                                   |
+| TK           | Tokelau                                      |
+| TL           | Timor-Leste                                  |
+| TM           | Turkmenistan                                 |
+| TN           | Tunisia                                      |
+| TO           | Tonga                                        |
+| TR           | Turkey                                       |
+| TT           | Trinidad and Tobago                          |
+| TV           | Tuvalu                                       |
+| TW           | Taiwan                                       |
+| TZ           | Tanzania                                     |
+| UA           | Ukraine                                      |
+| UG           | Uganda                                       |
+| UM           | United States Minor Outlying Islands         |
+| US           | United States                                |
+| UY           | Uruguay                                      |
+| UZ           | Uzbekistan                                   |
+| VA           | Vatican                                      |
+| VC           | Saint Vincent And The Grenadines             |
+| VE           | Venezuela                                    |
+| VG           | British Virgin Islands                       |
+| VI           | U.S. Virgin Islands                          |
+| VN           | Vietnam                                      |
+| VU           | Vanuatu                                      |
+| WF           | Wallis And Futuna                            |
+| WS           | Samoa                                        |
+| YE           | Yemen                                        |
+| YT           | Mayotte                                      |
+| ZA           | South Africa                                 |
+| ZM           | Zambia                                       |
+| ZW           | Zimbabwe                                     |
++--------------+----------------------------------------------+
+247 rows in set (0.00 sec)
+
+3. Country Service Pricing
+
+mysql> describe country_service_pricing;
++--------------------+--------------+------+-----+---------+----------------+
+| Field              | Type         | Null | Key | Default | Extra          |
++--------------------+--------------+------+-----+---------+----------------+
+| country_service_id | int(11)      | NO   | PRI | NULL    | auto_increment |
+| country_code       | char(3)      | YES  | MUL | NULL    |                |
+| service_id         | int(11)      | NO   | MUL | NULL    |                |
+| service_price      | decimal(7,2) | YES  |     | NULL    |                |
++--------------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from country_service_pricing;
++--------------------+--------------+------------+---------------+
+| country_service_id | country_code | service_id | service_price |
++--------------------+--------------+------------+---------------+
+|                  1 | US           |          1 |          8.00 |
+|                  2 | US           |          2 |         10.00 |
+|                  3 | US           |          4 |         12.00 |
+|                  5 | IN           |          4 |        840.00 |
+|                  6 | IN           |          2 |        700.00 |
+|                  7 | IN           |          1 |        560.00 |
+|                  8 | IN           |          1 |        840.00 |
+|                  9 | CA           |          1 |         15.84 |
+|                 10 | CA           |          1 |         17.16 |
+|                 11 | CA           |          1 |         19.80 |
+|                 12 | CA           |          1 |         13.20 |
+|                 13 | CA           |          1 |         13.20 |
+|                 14 | CA           |          4 |         18.48 |
+|                 15 | CA           |          4 |         15.84 |
+|                 16 | CA           |          4 |         17.16 |
+|                 17 | CA           |          2 |         17.16 |
+|                 18 | CA           |          2 |         17.16 |
+|                 19 | CA           |          2 |         17.16 |
++--------------------+--------------+------------+---------------+
+18 rows in set (0.00 sec)
+
+Use case: Get the latest Price for Service type: 4S and Country: IN.
+
+select max(country_service_id) from country_service_pricing where country_code='IN' and service_id='4';
++-------------------------+
+| max(country_service_id) |
++-------------------------+
+|                       5 |
++-------------------------+
+1 row in set (0.01 sec)
+
+4. Service Plan:
+
+mysql> describe service_plan;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| service_id   | int(11)      | NO   | PRI | NULL    | auto_increment |
+| service_desc | varchar(255) | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from service_plan;
++------------+--------------+
+| service_id | service_desc |
++------------+--------------+
+|          1 | 1S           |
+|          2 | 2S           |
+|          4 | 4S           |
++------------+--------------+
+3 rows in set (0.00 sec)
+
+5. Customer Membership Details
+
+mysql> describe customer_membership_details;
++-----------------+---------+------+-----+---------+----------------+
+| Field           | Type    | Null | Key | Default | Extra          |
++-----------------+---------+------+-----+---------+----------------+
+| customer_mem_id | int(11) | NO   | PRI | NULL    | auto_increment |
+| customer_id     | int(11) | NO   | MUL | 0       |                |
+| service_id      | int(11) | NO   | MUL | 0       |                |
++-----------------+---------+------+-----+---------+----------------+
+
+Data examples:
+
+mysql> select * from customer_membership_details;
++-----------------+-------------+------------+
+| customer_mem_id | customer_id | service_id |
++-----------------+-------------+------------+
+|               1 |           1 |          4 |
+|               2 |           1 |          2 |
++-----------------+-------------+------------+
+2 rows in set (0.00 sec)
+
